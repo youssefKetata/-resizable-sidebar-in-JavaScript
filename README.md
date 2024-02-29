@@ -1,4 +1,5 @@
 resizalbe side bar in javascript
+code pen: https://codepen.io/youssef5/pen/ZEZzYVZ?editors=0010
 
 functionality:
 
