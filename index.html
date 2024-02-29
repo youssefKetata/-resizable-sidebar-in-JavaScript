@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resizable Sidebar</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h3>sidebar</h3>
+          <button
+            rule="button"
+            class="collapse_icon"
+            aria-label="collapse button"
+          >
+            <svg
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="#666666"
+                fill-rule="evenodd"
+                d="M19 4.001H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-12a2 2 0 0 0-2-2Zm-15 2a1 1 0 0 1 1-1h4v14H5a1 1 0 0 1-1-1v-12Zm6 13h9a1 1 0 0 0 1-1v-12a1 1 0 0 0-1-1h-9v14Z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <ul>
+          <li>Home<span>5</span></li>
+          <hr />
+          <li>Home</li>
+          <hr />
+          <li>Home</li>
+          <hr />
+          <li>Home<span>5</span></li>
+        </ul>
+      </div>
+      <div class="resize-handle"></div>
+      <div class="content">
+        <h3>main content</h3>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat. Duis aute irure dolor in
+          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+          culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat. Duis aute irure dolor in
+          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+          culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+
+        <div class="data"></div>
+      </div>
+    </div>
+  </body>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      background-color: rgb(233, 232, 231);
+      width: 250px; /* Adjust default width */
+      padding-inline: 2rem;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+    }
+
+    button {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    .collapse_icon {
+      margin-left: auto;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar {
+      background-color: rgb(233, 232, 231);
+      width: 250px; /* Adjust default width */
+      padding-inline: 2rem;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.collapsed {
+      width: 0px;
+      display: none;
+    }
+
+    ul {
+      padding: 0;
+    }
+
+    ul > li {
+      display: flex;
+    }
+
+    ul > li:not(:last-child) {
+      margin-bottom: 0.5rem;
+    }
+
+    span {
+      margin-left: auto;
+    }
+
+    .content {
+      flex: 1; /* Fills remaining space */
+    }
+
+    .resize-handle {
+      width: 4px;
+      height: 100%;
+      background-color: darkgrey;
+      cursor: col-resize;
+      opacity: 0;
+      transition: opacity 0.1s ease-in-out;
+    }
+
+    .resize-handle:hover {
+      opacity: 1;
+    }
+
+    .content {
+      padding: 5rem;
+    }
+  </style>
+  <script>
+    const sidebar = document.querySelector(".sidebar");
+    const resizeHandle = document.querySelector(".resize-handle");
+    const container = document.querySelector(".container");
+
+    let isResizing = false;
+    let startWidth = 0;
+    let startCursorX = 0;
+    let paddingInline = 0;
+
+    resizeHandle.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+      isResizing = true;
+      const style = getComputedStyle(sidebar);
+      startWidth =
+        sidebar.clientWidth -
+        parseFloat(style.paddingLeft) -
+        parseFloat(style.paddingRight);
+
+      startCursorX = event.clientX;
+
+      let content = document.querySelector(".content");
+      const c_style = getComputedStyle(content);
+      paddingInline = c_style.paddingInline;
+    });
+
+    document.addEventListener("mouseup", () => {
+      isResizing = false;
+    });
+
+    document.addEventListener("mousemove", (event) => {
+      if (!isResizing) return;
+
+      const deltaX = event.clientX - startCursorX;
+      const newWidth = startWidth + deltaX;
+
+      let content = document.querySelector(".content");
+      content.style.paddingInline =
+        Math.min(
+          "100",
+          Math.max(parseInt(paddingInline) - deltaX * 0.3, "40")
+        ) + "px";
+      console.log(parseInt(paddingInline));
+
+      // Set minimum and maximum width
+      const minWidth = 150; // Adjust minimum width
+      const maxWidth = 350; // Adjust maximum width
+
+      sidebar.style.width =
+        Math.min(Math.max(newWidth, minWidth), maxWidth) + "px";
+    });
+
+    // Collapse sidebar
+    let collapse_icon = document.querySelector(".collapse_icon");
+    collapse_icon.addEventListener("click", () => {
+      let style = getComputedStyle(sidebar);
+      let sidebar_marginLeft = parseInt(style.marginLeft);
+      const width = sidebar.clientWidth;
+
+      if (sidebar_marginLeft === 0) {
+        sidebar.style.marginLeft = `-${width}px`;
+        collapse_icon.style.marginLeft = width + "px";
+        collapse_icon.style.position = "absolute";
+        resizeHandle.style.display = "none";
+      } else {
+        sidebar.style.marginLeft = "0px";
+        collapse_icon.style.marginLeft = "auto";
+        collapse_icon.style.position = "relative";
+        resizeHandle.style.display = "block";
+      }
+    });
+  </script>
+</html>
