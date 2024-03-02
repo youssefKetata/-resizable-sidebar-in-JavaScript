@@ -81,9 +81,11 @@
     }
 
     .sidebar {
+      position: relative;
       background-color: rgb(233, 232, 231);
       width: 250px; /* Adjust default width */
       padding-inline: 2rem;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .sidebar-header {
@@ -98,21 +100,15 @@
     }
 
     .collapse_icon {
-      margin-left: auto;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: absolute;
+      right: 12px;
+      transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .sidebar {
-      background-color: rgb(233, 232, 231);
-      width: 250px; /* Adjust default width */
-      padding-inline: 2rem;
-      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .sidebar.collapsed {
+    /* .sidebar.collapsed {
       width: 0px;
       display: none;
-    }
+    } */
 
     ul {
       padding: 0;
@@ -137,7 +133,7 @@
     .resize-handle {
       width: 4px;
       height: 100%;
-      background-color: darkgrey;
+      background-color: rgb(207, 207, 207);
       cursor: col-resize;
       opacity: 0;
       transition: opacity 0.1s ease-in-out;
@@ -155,13 +151,14 @@
     const sidebar = document.querySelector(".sidebar");
     const resizeHandle = document.querySelector(".resize-handle");
     const container = document.querySelector(".container");
+    let content = document.querySelector(".content");
 
     let isResizing = false;
     let startWidth = 0;
     let startCursorX = 0;
     let paddingInline = 0;
 
-    resizeHandle.addEventListener("mousedown", (event) => {
+    function handleMouseDown(event) {
       event.preventDefault();
       isResizing = true;
       const style = getComputedStyle(sidebar);
@@ -172,55 +169,57 @@
 
       startCursorX = event.clientX;
 
-      let content = document.querySelector(".content");
       const c_style = getComputedStyle(content);
       paddingInline = c_style.paddingInline;
-    });
+    }
 
-    document.addEventListener("mouseup", () => {
+    function handleMouseUp() {
       isResizing = false;
-    });
+    }
 
-    document.addEventListener("mousemove", (event) => {
+    function handleMouseMove(event) {
       if (!isResizing) return;
 
       const deltaX = event.clientX - startCursorX;
       const newWidth = startWidth + deltaX;
+      // Set minimum and maximum width
+      const minWidth = 150; // Adjust minimum width
+      const maxWidth = 350; // Adjust maximum width
 
-      let content = document.querySelector(".content");
+      // content dynamic padding
       content.style.paddingInline =
         Math.min(
           "100",
           Math.max(parseInt(paddingInline) - deltaX * 0.3, "40")
         ) + "px";
-      console.log(parseInt(paddingInline));
-
-      // Set minimum and maximum width
-      const minWidth = 150; // Adjust minimum width
-      const maxWidth = 350; // Adjust maximum width
 
       sidebar.style.width =
         Math.min(Math.max(newWidth, minWidth), maxWidth) + "px";
-    });
+    }
 
     // Collapse sidebar
-    let collapse_icon = document.querySelector(".collapse_icon");
-    collapse_icon.addEventListener("click", () => {
+    let collapseIcon = document.querySelector(".collapse_icon");
+    function handleCollapse() {
+      const hideWidth = -60;
+      const showWidth = 12;
       let style = getComputedStyle(sidebar);
       let sidebar_marginLeft = parseInt(style.marginLeft);
       const width = sidebar.clientWidth;
 
       if (sidebar_marginLeft === 0) {
-        sidebar.style.marginLeft = `-${width}px`;
-        collapse_icon.style.marginLeft = width + "px";
-        collapse_icon.style.position = "absolute";
-        resizeHandle.style.display = "none";
+        sidebar.style.marginLeft = `-${width}px`; //hide sidebar
+        collapseIcon.style.marginRight = hideWidth + "px"; //move collapse icon to the right
+        resizeHandle.style.display = "none"; //hide resize handle
       } else {
+        collapseIcon.style.marginRight = showWidth + "px";
         sidebar.style.marginLeft = "0px";
-        collapse_icon.style.marginLeft = "auto";
-        collapse_icon.style.position = "relative";
         resizeHandle.style.display = "block";
       }
-    });
+    }
+
+    resizeHandle.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    collapseIcon.addEventListener("click", handleCollapse);
   </script>
 </html>
