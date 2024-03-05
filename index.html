@@ -79,11 +79,15 @@
     }
 
     .sidebar {
+      position: static;
+      --sidebar-paddingInline: 2rem;
+      --sidebar-width: 250px; /* Adjust default width */
       position: relative;
       background-color: rgb(233, 232, 231);
-      width: 250px; /* Adjust default width */
-      padding-inline: 2rem;
+      width: var(--sidebar-width);
+      padding-inline: var(--sidebar-paddingInline);
       transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 100vh;
     }
 
     .sidebar-header {
@@ -136,6 +140,36 @@
 
     .resize-handle:hover {
       opacity: 1;
+    }
+
+    .overlay {
+      position: fixed;
+
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    @media (max-width: 750px) {
+      .sidebar {
+        margin-left: calc(
+          calc(var(--sidebar-width) + calc(var(--sidebar-paddingInline) * 2)) *
+            -1
+        );
+      }
+      .resize-handle {
+        display: none;
+      }
+      .collapse_icon {
+        margin-right: -60px;
+      }
+      .content {
+        padding-inline: 2rem !important;
+      }
     }
   </style>
   <script>
@@ -194,10 +228,16 @@
     // if sidebar is collapsed make content padding more
     let collapseIcon = document.querySelector(".collapse_icon");
     function handleCollapse() {
-      const hideWidth = -60;
-      const showWidth = 12;
       let style = getComputedStyle(sidebar);
       let sidebar_marginLeft = parseInt(style.marginLeft);
+      // on mobile view
+
+      mobile_sidebar();
+
+      // on desktop view
+      const hideWidth = -60;
+      const showWidth = 12;
+
       const width = sidebar.clientWidth;
 
       if (sidebar_marginLeft === 0) {
@@ -205,7 +245,7 @@
         collapseIcon.style.marginRight = hideWidth + "px"; // move collapse icon to the right
         resizeHandle.style.display = "none"; // hide resize handle
         // Set a larger content padding when the sidebar is collapsed
-        content.style.paddingInline = "20rem";
+        content.style.paddingInline = "15rem";
       } else {
         collapseIcon.style.marginRight = showWidth + "px";
         sidebar.style.marginLeft = "0px";
@@ -213,6 +253,20 @@
         // Restore the original content padding when the sidebar is expanded
         content.style.paddingInline = originalContentPadding;
       }
+    }
+
+    function mobile_sidebar() {
+      if (window.innerWidth < 750) {
+        sidebar.style.zIndex = "1";
+        sidebar.style.position = "absolute";
+        let overlay = document.createElement("div");
+        overlay.classList.add("overlay");
+        container.appendChild(overlay);
+      }
+      // else {
+      //   sidebar.style.zIndex = "0";
+      //   sidebar.style.position = "relative";
+      // }
     }
 
     resizeHandle.addEventListener("mousedown", handleMouseDown);
