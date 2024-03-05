@@ -63,8 +63,6 @@
           pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
           culpa qui officia deserunt mollit anim id est laborum.
         </p>
-
-        <div class="data"></div>
       </div>
     </div>
   </body>
@@ -105,11 +103,6 @@
       transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* .sidebar.collapsed {
-      width: 0px;
-      display: none;
-    } */
-
     ul {
       padding: 0;
     }
@@ -128,6 +121,8 @@
 
     .content {
       flex: 1; /* Fills remaining space */
+      padding: 5rem;
+      transition: padding-inline 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .resize-handle {
@@ -142,10 +137,6 @@
     .resize-handle:hover {
       opacity: 1;
     }
-
-    .content {
-      padding: 5rem;
-    }
   </style>
   <script>
     const sidebar = document.querySelector(".sidebar");
@@ -157,6 +148,7 @@
     let startWidth = 0;
     let startCursorX = 0;
     let paddingInline = 0;
+    let originalContentPadding = ""; // Store the original content padding
 
     function handleMouseDown(event) {
       event.preventDefault();
@@ -188,16 +180,18 @@
 
       // content dynamic padding
       content.style.paddingInline =
-        Math.min(
-          "100",
-          Math.max(parseInt(paddingInline) - deltaX * 0.3, "40")
-        ) + "px";
+        Math.min("140", Math.max(parseInt(paddingInline) - deltaX, "60")) +
+        "px";
+
+      // Update originalContentPadding when resizing
+      originalContentPadding = content.style.paddingInline;
 
       sidebar.style.width =
         Math.min(Math.max(newWidth, minWidth), maxWidth) + "px";
     }
 
     // Collapse sidebar
+    // if sidebar is collapsed make content padding more
     let collapseIcon = document.querySelector(".collapse_icon");
     function handleCollapse() {
       const hideWidth = -60;
@@ -207,13 +201,17 @@
       const width = sidebar.clientWidth;
 
       if (sidebar_marginLeft === 0) {
-        sidebar.style.marginLeft = `-${width}px`; //hide sidebar
-        collapseIcon.style.marginRight = hideWidth + "px"; //move collapse icon to the right
-        resizeHandle.style.display = "none"; //hide resize handle
+        sidebar.style.marginLeft = `-${width}px`; // hide sidebar
+        collapseIcon.style.marginRight = hideWidth + "px"; // move collapse icon to the right
+        resizeHandle.style.display = "none"; // hide resize handle
+        // Set a larger content padding when the sidebar is collapsed
+        content.style.paddingInline = "20rem";
       } else {
         collapseIcon.style.marginRight = showWidth + "px";
         sidebar.style.marginLeft = "0px";
         resizeHandle.style.display = "block";
+        // Restore the original content padding when the sidebar is expanded
+        content.style.paddingInline = originalContentPadding;
       }
     }
 
