@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <title>Resizable Sidebar</title>
   </head>
   <body>
@@ -44,7 +45,7 @@
       </div>
       <div class="resize-handle"></div>
       <div class="content">
-        <h3>main content</h3>
+        <h3 class="main_content-title">main content</h3>
         <p>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
@@ -66,123 +67,24 @@
       </div>
     </div>
   </body>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
 
-    .container {
-      display: flex;
-      height: 100vh;
-    }
-
-    .sidebar {
-      position: static;
-      --sidebar-paddingInline: 2rem;
-      --sidebar-width: 250px; /* Adjust default width */
-      position: relative;
-      background-color: rgb(233, 232, 231);
-      width: var(--sidebar-width);
-      padding-inline: var(--sidebar-paddingInline);
-      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      height: 100vh;
-    }
-
-    .sidebar-header {
-      display: flex;
-      align-items: center;
-    }
-
-    button {
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-    }
-
-    .collapse_icon {
-      position: absolute;
-      right: 12px;
-      transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    ul {
-      padding: 0;
-    }
-
-    ul > li {
-      display: flex;
-    }
-
-    ul > li:not(:last-child) {
-      margin-bottom: 0.5rem;
-    }
-
-    span {
-      margin-left: auto;
-    }
-
-    .content {
-      flex: 1; /* Fills remaining space */
-      padding: 5rem;
-      transition: padding-inline 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .resize-handle {
-      width: 4px;
-      height: 100%;
-      background-color: rgb(207, 207, 207);
-      cursor: col-resize;
-      opacity: 0;
-      transition: opacity 0.1s ease-in-out;
-    }
-
-    .resize-handle:hover {
-      opacity: 1;
-    }
-
-    .overlay {
-      position: fixed;
-
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-    }
-
-    @media (max-width: 750px) {
-      .sidebar {
-        margin-left: calc(
-          calc(var(--sidebar-width) + calc(var(--sidebar-paddingInline) * 2)) *
-            -1
-        );
-      }
-      .resize-handle {
-        display: none;
-      }
-      .collapse_icon {
-        margin-right: -60px;
-      }
-      .content {
-        padding-inline: 2rem !important;
-      }
-    }
-  </style>
   <script>
     const sidebar = document.querySelector(".sidebar");
     const resizeHandle = document.querySelector(".resize-handle");
     const container = document.querySelector(".container");
     let content = document.querySelector(".content");
+    // Set minimum and maximum width if the sidebar
+    const minWidth = 150; // Adjust minimum width in px
+    const maxWidth = 360; // Adjust maximum width in px
 
     let isResizing = false;
     let startWidth = 0;
     let startCursorX = 0;
     let paddingInline = 0;
     let originalContentPadding = ""; // Store the original content padding
+
+    const hideMargin = -60;
+    const showMargin = 12;
 
     function handleMouseDown(event) {
       event.preventDefault();
@@ -192,11 +94,7 @@
         sidebar.clientWidth -
         parseFloat(style.paddingLeft) -
         parseFloat(style.paddingRight);
-
       startCursorX = event.clientX;
-
-      const c_style = getComputedStyle(content);
-      paddingInline = c_style.paddingInline;
     }
 
     function handleMouseUp() {
@@ -208,66 +106,67 @@
 
       const deltaX = event.clientX - startCursorX;
       const newWidth = startWidth + deltaX;
-      // Set minimum and maximum width
-      const minWidth = 150; // Adjust minimum width
-      const maxWidth = 350; // Adjust maximum width
-
-      // content dynamic padding
-      content.style.paddingInline =
-        Math.min("140", Math.max(parseInt(paddingInline) - deltaX, "60")) +
-        "px";
-
-      // Update originalContentPadding when resizing
-      originalContentPadding = content.style.paddingInline;
 
       sidebar.style.width =
         Math.min(Math.max(newWidth, minWidth), maxWidth) + "px";
     }
 
     // Collapse sidebar
-    // if sidebar is collapsed make content padding more
     let collapseIcon = document.querySelector(".collapse_icon");
     function handleCollapse() {
       let style = getComputedStyle(sidebar);
       let sidebar_marginLeft = parseInt(style.marginLeft);
+
       // on mobile view
-
-      mobile_sidebar();
-
-      // on desktop view
-      const hideWidth = -60;
-      const showWidth = 12;
-
       const width = sidebar.clientWidth;
-
-      if (sidebar_marginLeft === 0) {
-        sidebar.style.marginLeft = `-${width}px`; // hide sidebar
-        collapseIcon.style.marginRight = hideWidth + "px"; // move collapse icon to the right
-        resizeHandle.style.display = "none"; // hide resize handle
-        // Set a larger content padding when the sidebar is collapsed
-        content.style.paddingInline = "15rem";
-      } else {
-        collapseIcon.style.marginRight = showWidth + "px";
-        sidebar.style.marginLeft = "0px";
-        resizeHandle.style.display = "block";
-        // Restore the original content padding when the sidebar is expanded
-        content.style.paddingInline = originalContentPadding;
+      if (window.innerWidth < 750) mobile_sidebar(width);
+      else {
+        if (sidebar_marginLeft === 0) {
+          sidebar.style.marginLeft = `-${width}px`; // hide sidebar
+          collapseIcon.style.marginRight = hideMargin + "px"; // move collapse icon to the right
+          resizeHandle.style.display = "none"; // hide resize handle
+        } else {
+          collapseIcon.style.marginRight = showMargin + "px";
+          sidebar.style.marginLeft = "0px";
+          resizeHandle.style.display = "block";
+        }
       }
     }
 
-    function mobile_sidebar() {
-      if (window.innerWidth < 750) {
+    function mobile_sidebar(width) {
+      // se if the side bar is hidden or not
+      if (sidebar.style.marginLeft === "0px") {
+        console.log("sidebar is hidden");
+        sidebar.style.marginLeft = `-${width}px`; // hide sidebar
+        collapseIcon.style.marginRight = hideMargin + "px"; // move collapse icon to the right
+        let overlay = document.querySelector(".overlay");
+        container.removeChild(overlay);
+      } else {
         sidebar.style.zIndex = "1";
         sidebar.style.position = "absolute";
+        sidebar.style.width = "250px";
         let overlay = document.createElement("div");
         overlay.classList.add("overlay");
         container.appendChild(overlay);
+        collapseIcon.style.marginRight = showMargin + "px";
+        sidebar.style.marginLeft = "0px";
       }
-      // else {
-      //   sidebar.style.zIndex = "0";
-      //   sidebar.style.position = "relative";
-      // }
     }
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth < 750) {
+        const width = sidebar.clientWidth;
+        sidebar.style.marginLeft = `-${width}px`;
+        collapseIcon.style.marginRight = hideMargin + "px";
+      } else {
+        sidebar.style.marginLeft = "0px";
+        collapseIcon.style.marginRight = showMargin + "px";
+        // sidebar.style.zIndex = "0";
+        sidebar.style.position = "relative";
+        let overlay = document.querySelector(".overlay");
+        if (overlay) container.removeChild(overlay);
+      }
+    });
 
     resizeHandle.addEventListener("mousedown", handleMouseDown);
     document.addEventListener("mouseup", handleMouseUp);
