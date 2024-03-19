@@ -1,6 +1,12 @@
-body {
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+body {
   font-family: Arial, sans-serif;
 }
 
@@ -12,8 +18,9 @@ body {
 .sidebar {
   position: static;
   --sidebar-paddingInline: 2rem;
-  --sidebar-width: 250px; /* Adjust default width */
+  --sidebar-width: 300px; /* Adjust default width */
   position: relative;
+  padding-top: 1rem;
   background-color: rgba(241, 241, 241, 0.884);
   width: var(--sidebar-width);
   max-width: 100% !important;
@@ -25,6 +32,7 @@ body {
 .sidebar-header {
   display: flex;
   align-items: center;
+  margin-block: 1rem;
 }
 
 button {
@@ -35,7 +43,7 @@ button {
 
 .collapse_icon {
   position: absolute;
-  right: 12px;
+  right: 25px;
   transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

@@ -73,9 +73,10 @@
     const resizeHandle = document.querySelector(".resize-handle");
     const container = document.querySelector(".container");
     let content = document.querySelector(".content");
+    const collapseIcon = document.querySelector(".collapse_icon");
     // Set minimum and maximum width if the sidebar
-    const minWidth = 150; // Adjust minimum width in px
-    const maxWidth = 360; // Adjust maximum width in px
+    const minWidth = 230; // Adjust minimum width in px
+    const maxWidth = 400; // Adjust maximum width in px
 
     let isResizing = false;
     let startWidth = 0;
@@ -84,17 +85,14 @@
     let originalContentPadding = ""; // Store the original content padding
 
     const hideMargin = -60;
-    const showMargin = 12;
+    const showMargin = 0;
 
     function handleMouseDown(event) {
       const style = getComputedStyle(sidebar);
       event.preventDefault();
       isResizing = true;
 
-      startWidth =
-        sidebar.clientWidth -
-        parseFloat(style.paddingLeft) -
-        parseFloat(style.paddingRight);
+      startWidth = sidebar.clientWidth;
       startCursorX = event.clientX;
     }
 
@@ -122,7 +120,7 @@
     }
 
     // Collapse sidebar
-    let collapseIcon = document.querySelector(".collapse_icon");
+
     function handleCollapse() {
       let style = getComputedStyle(sidebar);
       let sidebar_marginLeft = parseInt(style.marginLeft);
