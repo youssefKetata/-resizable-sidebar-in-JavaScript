@@ -36,11 +36,11 @@
         <ul>
           <li>Home<span>5</span></li>
           <hr />
-          <li>Home</li>
+          <li>inbox</li>
           <hr />
           <li>Home</li>
           <hr />
-          <li>Home<span>5</span></li>
+          <li>Tasks<span>5</span></li>
         </ul>
       </div>
       <div class="resize-handle"></div>
@@ -87,9 +87,10 @@
     const showMargin = 12;
 
     function handleMouseDown(event) {
+      const style = getComputedStyle(sidebar);
       event.preventDefault();
       isResizing = true;
-      const style = getComputedStyle(sidebar);
+
       startWidth =
         sidebar.clientWidth -
         parseFloat(style.paddingLeft) -
@@ -106,9 +107,18 @@
 
       const deltaX = event.clientX - startCursorX;
       const newWidth = startWidth + deltaX;
-
       sidebar.style.width =
         Math.min(Math.max(newWidth, minWidth), maxWidth) + "px";
+    }
+
+    function hideSideBar(width) {
+      sidebar.style.marginLeft = `-${width}px`;
+      collapseIcon.style.marginRight = hideMargin + "px"; // move collapse icon to the right
+    }
+
+    function showSideBar() {
+      sidebar.style.marginLeft = "0px";
+      collapseIcon.style.marginRight = showMargin + "px";
     }
 
     // Collapse sidebar
@@ -116,54 +126,51 @@
     function handleCollapse() {
       let style = getComputedStyle(sidebar);
       let sidebar_marginLeft = parseInt(style.marginLeft);
-
-      // on mobile view
       const width = sidebar.clientWidth;
+
       if (window.innerWidth < 750) mobile_sidebar(width);
       else {
         if (sidebar_marginLeft === 0) {
-          sidebar.style.marginLeft = `-${width}px`; // hide sidebar
-          collapseIcon.style.marginRight = hideMargin + "px"; // move collapse icon to the right
+          hideSideBar(width);
           resizeHandle.style.display = "none"; // hide resize handle
         } else {
-          collapseIcon.style.marginRight = showMargin + "px";
-          sidebar.style.marginLeft = "0px";
+          showSideBar();
           resizeHandle.style.display = "block";
         }
       }
     }
 
+    function addOverlay(container) {
+      let overlay = document.createElement("div");
+      overlay.classList.add("overlay");
+      container.appendChild(overlay);
+    }
+
     function mobile_sidebar(width) {
-      // se if the side bar is hidden or not
+      let overlay = document.querySelector(".overlay");
       if (sidebar.style.marginLeft === "0px") {
-        console.log("sidebar is hidden");
-        sidebar.style.marginLeft = `-${width}px`; // hide sidebar
-        collapseIcon.style.marginRight = hideMargin + "px"; // move collapse icon to the right
-        let overlay = document.querySelector(".overlay");
+        hideSideBar(width);
+
         container.removeChild(overlay);
       } else {
         sidebar.style.zIndex = "1";
         sidebar.style.position = "absolute";
         sidebar.style.width = "250px";
-        let overlay = document.createElement("div");
-        overlay.classList.add("overlay");
-        container.appendChild(overlay);
-        collapseIcon.style.marginRight = showMargin + "px";
-        sidebar.style.marginLeft = "0px";
+        addOverlay(container);
+        showSideBar();
       }
     }
 
+    //keep the sidebar collapsed when the window is resized
     window.addEventListener("resize", () => {
       if (window.innerWidth < 750) {
         const width = sidebar.clientWidth;
-        sidebar.style.marginLeft = `-${width}px`;
-        collapseIcon.style.marginRight = hideMargin + "px";
+        hideSideBar(width);
       } else {
-        sidebar.style.marginLeft = "0px";
-        collapseIcon.style.marginRight = showMargin + "px";
-        // sidebar.style.zIndex = "0";
-        sidebar.style.position = "relative";
         let overlay = document.querySelector(".overlay");
+        showSideBar();
+        sidebar.style.position = "relative";
+
         if (overlay) container.removeChild(overlay);
       }
     });

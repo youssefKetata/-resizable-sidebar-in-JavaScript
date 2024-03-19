@@ -14,7 +14,7 @@ body {
   --sidebar-paddingInline: 2rem;
   --sidebar-width: 250px; /* Adjust default width */
   position: relative;
-  background-color: rgb(233, 232, 231);
+  background-color: rgba(241, 241, 241, 0.884);
   width: var(--sidebar-width);
   max-width: 100% !important;
   padding-inline: var(--sidebar-paddingInline);
