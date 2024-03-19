@@ -146,6 +146,11 @@
       container.appendChild(overlay);
     }
 
+    function removeOverlay(container) {
+      let overlay = document.querySelector(".overlay");
+      if (overlay) container.removeChild(overlay);
+    }
+
     function mobile_sidebar(width) {
       let overlay = document.querySelector(".overlay");
       if (sidebar.style.marginLeft === "0px") {
@@ -166,12 +171,14 @@
       if (window.innerWidth < 750) {
         const width = sidebar.clientWidth;
         hideSideBar(width);
+        removeOverlay(container);
       } else {
-        let overlay = document.querySelector(".overlay");
         showSideBar();
-        sidebar.style.position = "relative";
 
-        if (overlay) container.removeChild(overlay);
+        sidebar.style.position = "relative";
+        console.log("re");
+
+        removeOverlay(container);
       }
     });
 
