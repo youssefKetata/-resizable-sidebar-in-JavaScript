@@ -148,7 +148,9 @@
 
     function removeOverlay(container) {
       let overlay = document.querySelector(".overlay");
-      if (overlay) container.removeChild(overlay);
+      if (overlay && container.contains(overlay)) {
+        container.removeChild(overlay);
+      }
     }
 
     function mobile_sidebar(width) {
